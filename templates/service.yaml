@@ -1,0 +1,18 @@
+# epics-console-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "epics-console-chart.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
+spec:
+  ports:
+    - name: novnc
+      port: 80
+      targetPort: 80
+    - name: vnc
+      port: 5900
+      targetPort: 5900
+  selector:
+    app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
+

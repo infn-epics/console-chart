@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "epics-console-chart.release" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
+    spec:
+      {{ if ne .Values.serviceAccountName "" }}
+      serviceAccountName: {{ .Values.serviceAccountName | quote }}
+      {{ end }}
+      hostNetwork: {{ .Values.hostNetwork | quote }}
+    {{ if .Values.opi.init }}
+      initContainers:
+      - name: init-volume
+        image: alpine:latest
+        command: 
+        - sh 
+        - -c
+        - |
+          apk --no-cache add git
+          cd /tmp
+          if [ -d /tmp/opi ];then
+            rm -rf /tmp/opi
+          fi
+          git clone {{ .Values.opi.repo }} --recurse-submodules opi
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: opis-volume
+          mountPath: /tmp
+    {{ end }}
+
+      containers:
+        - name: epics-console
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: 80
+            - containerPort: 5900
+          securityContext:
+            privileged: true
+          env:
+          - name: OPIHOME
+            value: /phoebus/interface/opi
+  
+          {{ if .Values.env  }}
+          {{- range $envVar := .Values.env }}
+          - name: {{ $envVar.name }}
+            value: {{ $envVar.value | quote }}
+          {{- end }}
+          {{- end }}
+          volumeMounts:
+          - name: x11-socket
+            mountPath: /tmp/.X11-unix
+          {{- if .Values.opi.claim }}
+          - name: opis-volume
+            mountPath: /phoebus/interface
+          {{- end }}
+      volumes:
+        - name: x11-socket
+          hostPath:
+            path: /tmp/.X11-unix
+        {{- if .Values.opi.claim }}
+        - name: opis-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.opi.claim }}
+        {{- end }}

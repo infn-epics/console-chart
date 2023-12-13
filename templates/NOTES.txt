@@ -1,0 +1,18 @@
+Thank you for using epics-console-chart!
+
+{{- if .Values.route.enabled -}}
+{{- if .Values.route.host -}}
+To access the EPICS console, use the following URL:
+http://{{ .Release.Name }}.{{ .Values.route.host }}
+{{- else }}
+Missing host namespace, route.host no route created
+{{- end }}
+{{- else }}
+No route enabled console not very useful
+{{- end }}
+
+{{ if .Values.opi.configMapName  }}
+mapping {{.Values.opi.configMapName }}
+{{- else }}
+no opi configuration specified
+{{- end }}

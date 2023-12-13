@@ -1,0 +1,6 @@
+# epics-console-chart/Chart.yaml
+apiVersion: v2
+name: epics-console-chart
+description: A Helm chart for deploying an EPICS console
+version: 0.1.0
+
