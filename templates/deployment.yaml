@@ -32,6 +32,7 @@ spec:
             rm -rf /tmp/opi
           fi
           git clone {{ .Values.opi.repo }} --recurse-submodules opi
+          chmod a+w,a+r -R opi
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: opis-volume
@@ -49,6 +50,8 @@ spec:
           env:
           - name: OPIHOME
             value: /phoebus/interface/opi
+          - name: OPISTART
+            value: {{ .Values.opi.exec | quote }}
   
           {{ if .Values.env  }}
           {{- range $envVar := .Values.env }}

@@ -1,6 +1,6 @@
 # epics-console-chart/values.yaml
 image:
-  repository: michelo/epics-console
+  repository: baltig.infn.it:4567/epics-containers/epics-docker-console
   tag: latest
 
 
@@ -10,10 +10,10 @@ route:
   host: apps.okd-datest.lnf.infn.it ## host name namespace
 
 opi:
-  start: /opi/phoebus_start.sh
+  exec: start.sh
   claim: opi-repo
   init: true
-  repo: https://baltig.infn.it/lnf-da-control/epics-menlo-lac1550.git
+  repo: https://baltig.infn.it/lnf-da-control/sparc-epics-opi.git
 
 securityContext:
             privileged: true
