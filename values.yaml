@@ -12,7 +12,7 @@ route:
 opi:
   exec: start.sh
   claim: opi-repo
-  init: true
+  init: false
   repo: https://baltig.infn.it/lnf-da-control/sparc-epics-opi.git
 
 securityContext:

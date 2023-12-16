@@ -4,15 +4,21 @@ metadata:
   name: {{ include "epics-console-chart.release" . }}
   labels:
     app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
+    app.kubernetes.io/instance: {{ include "epics-console-chart.release" . }}
+
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
+      app.kubernetes.io/instance: {{ include "epics-console-chart.release" . }}
+
   template:
     metadata:
       labels:
         app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
+        app.kubernetes.io/instance: {{ include "epics-console-chart.release" . }}
+
     spec:
       {{ if ne .Values.serviceAccountName "" }}
       serviceAccountName: {{ .Values.serviceAccountName | quote }}

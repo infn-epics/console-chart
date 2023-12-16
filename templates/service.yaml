@@ -4,7 +4,8 @@ kind: Service
 metadata:
   name: {{ include "epics-console-chart.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
+    app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}-service
+    app.kubernetes.io/instance: {{ include "epics-console-chart.release" . }}-service
 spec:
   ports:
     - name: novnc
@@ -15,4 +16,6 @@ spec:
       targetPort: 5900
   selector:
     app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
+    app.kubernetes.io/instance: {{ include "epics-console-chart.release" . }}
+
 
