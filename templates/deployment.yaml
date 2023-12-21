@@ -80,4 +80,8 @@ spec:
         - name: opis-volume
           persistentVolumeClaim:
             claimName: {{ .Values.opi.claim }}
+        {{- else }}
+        - name: opis-volume
+          persistentVolumeClaim:
+            claimName: {{ include "epics-console-chart.release" . }}-pvc
         {{- end }}

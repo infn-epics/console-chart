@@ -1,0 +1,12 @@
+{{- if not .Values.opi.claim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "epics-console-chart.release" . }}-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Mi
+{{-end }}
