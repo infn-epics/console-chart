@@ -2,6 +2,7 @@
 image:
   repository: baltig.infn.it:4567/epics-containers/epics-docker-console
   tag: latest
+  imagePullPolicy: Always
 
 
 

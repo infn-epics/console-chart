@@ -48,6 +48,8 @@ spec:
       containers:
         - name: epics-console
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+
           ports:
             - containerPort: 80
             - containerPort: 5900
