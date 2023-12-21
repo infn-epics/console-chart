@@ -55,7 +55,7 @@ spec:
             privileged: true
           env:
           - name: OPIHOME
-            value: /phoebus/interface/opi
+            value: /mnt/opi
           - name: OPISTART
             value: {{ .Values.opi.exec | quote }}
   
@@ -70,7 +70,7 @@ spec:
             mountPath: /tmp/.X11-unix
           {{- if .Values.opi.claim }}
           - name: opis-volume
-            mountPath: /phoebus/interface
+            mountPath: /mnt/opi
           {{- end }}
       volumes:
         - name: x11-socket
