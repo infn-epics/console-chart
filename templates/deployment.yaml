@@ -71,7 +71,7 @@ spec:
           - name: x11-socket
             mountPath: /tmp/.X11-unix
           - name: opis-volume
-            mountPath: /phoebus/interface/opi  
+            mountPath: /phoebus/interface
       volumes:
         - name: x11-socket
           hostPath:
