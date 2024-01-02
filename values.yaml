@@ -16,6 +16,7 @@ opi:
   init: true
   repo: https://baltig.infn.it/lnf-da-control/sparc-epics-opi.git
 
+serviceAccountName: default
 securityContext:
             privileged: true
 # env:
