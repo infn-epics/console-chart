@@ -35,21 +35,21 @@ spec:
           apk --no-cache add git
         
           rm -rf /tmp/*
+          cd /tmp
           if [ -n "{{ .Values.opi.branch }}" ];then
-            git clone -b {{ .Values.opi.branch }} {{ .Values.opi.url }} --recurse-submodules temp-config
+            git clone -b {{ .Values.opi.branch }} {{ .Values.opi.url }} --recurse-submodules opi-repo
           else
-            git clone {{ .Values.opi.url }} --recurse-submodules temp-config
+            git clone {{ .Values.opi.url }} --recurse-submodules opi-repo
           fi
 
-          if [ -d temp-config/{{ .Values.opi.path}} ];then
+          if [ -d opi-repo/{{ .Values.opi.path}} ];then
             if [ "{{ .Values.opi.path }}" == "." ];then
-                mv temp-config/ /tmp/opi
+                ln -sf /tmp/opi-repo /tmp/opi
             else
-              mv temp-config/{{ .Values.opi.path}} /tmp/opi
-              rm -rf temp-config
+              ln -sf /tmp/opi-repo/{{ .Values.opi.path}} /tmp/opi
             fi
           else
-            mv temp-config /tmp/opi
+            ln -sf /tmp/opi-repo /tmp/opi
           fi
 
           chmod a+w,a+r -R /tmp
