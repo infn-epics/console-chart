@@ -33,12 +33,26 @@ spec:
         - -c
         - |
           apk --no-cache add git
-          cd /tmp
-          if [ -d /tmp/opi ];then
-            rm -rf /tmp/opi
+        
+          rm -rf /tmp/*
+          if [ -n "{{ .Values.opi.branch }}" ];then
+            git clone -b {{ .Values.opi.branch }} {{ .Values.opi.url }} --recurse-submodules temp-config
+          else
+            git clone {{ .Values.opi.url }} --recurse-submodules temp-config
           fi
-          git clone {{ .Values.opi.repo }} --recurse-submodules opi
-          chmod a+w,a+r -R opi
+
+          if [ -d temp-config/{{ .Values.opi.path}} ];then
+            if [ "{{ .Values.opi.path }}" == "." ];then
+                mv temp-config/ /tmp/opi
+            else
+              mv temp-config/{{ .Values.opi.path}} /tmp/opi
+              rm -rf temp-config
+            fi
+          else
+            mv temp-config /tmp/opi
+          fi
+
+          chmod a+w,a+r -R /tmp
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: opis-volume
