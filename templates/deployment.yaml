@@ -44,12 +44,12 @@ spec:
 
           if [ -d opi-repo/{{ .Values.opi.path}} ];then
             if [ "{{ .Values.opi.path }}" == "." ];then
-                ln -sf /tmp/opi-repo /tmp/opi
+                ln -sf opi-repo opi
             else
-              ln -sf /tmp/opi-repo/{{ .Values.opi.path}} /tmp/opi
+              ln -sf opi-repo/{{ .Values.opi.path}} opi
             fi
           else
-            ln -sf /tmp/opi-repo /tmp/opi
+            ln -sf opi-repo opi
           fi
 
           chmod a+w,a+r -R /tmp
