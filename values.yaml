@@ -12,7 +12,7 @@ route:
 
 opi:
   exec: start.sh
-  claim:
+  claim: ## an existing claim
   init: true
   url: https://baltig.infn.it/lnf-da-control/sparc-epics-opi.git
   path: .
@@ -20,6 +20,11 @@ opi:
 serviceAccountName: default
 securityContext:
             privileged: true
-# env:
-#    - name: EPICS_CA_ADDR_LIST
-#      value: myiocip1,myiocip2
+
+# The following are ReadWriteMany PVCs that are shared
+# if not specified a claim ReadWriteOnce is created for each
+
+# use the shared PVC autosave files (comment out for no autosave)
+autosaveClaim:
+# use the shared PVC to share data
+dataClaim:

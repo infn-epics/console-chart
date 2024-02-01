@@ -1,8 +1,42 @@
 {{- if not .Values.opi.claim }}
 apiVersion: v1
 kind: PersistentVolumeClaim
+beamline: {{ .Values.beamline }}
+
 metadata:
-  name: {{ include "epics-console-chart.release" . }}-pvc
+  name: {{ include "epics-console-chart.release" . }}-opi-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+{{- end }}
+
+{{- if not .Values.autosaveClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+beamline: {{ .Values.beamline }}
+
+metadata:
+  name: {{ include "epics-console-chart.release" . }}-autosave-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+{{- end }}
+
+{{- if not .Values.dataClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+beamline: {{ .Values.beamline }}
+
+metadata:
+  name: {{ include "epics-console-chart.release" . }}-data-pvc
 spec:
   accessModes:
     - ReadWriteOnce

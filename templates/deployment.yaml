@@ -51,12 +51,16 @@ spec:
           else
             ln -sf opi-repo opi
           fi
-
-          chmod a+w,a+r -R /tmp
+          mkdir -p /data/opi /autosave/opi
+          chmod a+w,a+r -R /tmp /data /autosave
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: opis-volume
           mountPath: /tmp
+        - name: autosave-volume
+          mountPath: /autosave
+        - name: data-volume
+          mountPath: /data
     {{ end }}
 
       containers:
@@ -72,6 +76,8 @@ spec:
           env:
           - name: OPIHOME
             value: /phoebus/interface/opi
+          - name: OPIDATA
+            value: /data/opi
           - name: OPISTART
             value: {{ .Values.opi.exec | quote }}
   
@@ -86,6 +92,10 @@ spec:
             mountPath: /tmp/.X11-unix
           - name: opis-volume
             mountPath: /phoebus/interface
+          - name: autosave-volume
+            mountPath: /autosave
+          - name: data-volume
+            mountPath: /data
       volumes:
         - name: x11-socket
           hostPath:
@@ -97,5 +107,20 @@ spec:
         {{- else }}
         - name: opis-volume
           persistentVolumeClaim:
-            claimName: {{ include "epics-console-chart.release" . }}-pvc
+            claimName: {{ include "epics-console-chart.release" . }}-opi-pvc
         {{- end }}
+        - name: autosave-volume
+          persistentVolumeClaim:
+            {{- if .Values.autosave }}
+            claimName: {{ .Values.autosave }}
+            {{- else }}
+            claimName: {{ include "epics-console-chart.release" . }}-autosave-pvc
+            {{- end }}
+        - name: data-volume
+          persistentVolumeClaim:
+            {{- if .Values.dataClaim }}
+            claimName: {{ .Values.dataClaim }}
+            {{- else }}
+            claimName: {{ include "epics-console-chart.release" . }}-data-pvc
+            {{- end }}
+        
