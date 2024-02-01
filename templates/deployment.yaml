@@ -107,20 +107,20 @@ spec:
         {{- else }}
         - name: opis-volume
           persistentVolumeClaim:
-            claimName: {{ include "epics-console-chart.release" . }}-opi-pvc
+            claimName: {{ include "epics-console-chart.release" . }}-opi
         {{- end }}
         - name: autosave-volume
           persistentVolumeClaim:
             {{- if .Values.autosave }}
             claimName: {{ .Values.autosave }}
             {{- else }}
-            claimName: {{ include "epics-console-chart.release" . }}-autosave-pvc
+            claimName: {{ include "epics-console-chart.release" . }}-autosave
             {{- end }}
         - name: data-volume
           persistentVolumeClaim:
             {{- if .Values.dataClaim }}
             claimName: {{ .Values.dataClaim }}
             {{- else }}
-            claimName: {{ include "epics-console-chart.release" . }}-data-pvc
+            claimName: {{ include "epics-console-chart.release" . }}-data
             {{- end }}
         
