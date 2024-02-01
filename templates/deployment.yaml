@@ -5,6 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
     app.kubernetes.io/instance: {{ include "epics-console-chart.release" . }}
+    beamline: {{ .Values.beamline | quote }}
 
 spec:
   replicas: 1

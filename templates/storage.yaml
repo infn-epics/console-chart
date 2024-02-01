@@ -5,7 +5,7 @@ metadata:
   name: {{ include "epics-console-chart.release" . }}-opi
   labels:
     app: {{ include "epics-console-chart.release" . }}
-    beamline: {{ .Values.beamline }}
+    beamline: {{ .Values.beamline | quote }}
 spec:
   accessModes:
     - ReadWriteOnce
@@ -22,7 +22,7 @@ metadata:
   name: {{ include "epics-console-chart.release" . }}-autosave
   labels:
     app: {{ include "epics-console-chart.release" . }}
-    beamline: {{ .Values.beamline }}
+    beamline: {{ .Values.beamline | quote}}
 spec:
   accessModes:
     - ReadWriteOnce
@@ -39,7 +39,7 @@ metadata:
   name: {{ include "epics-console-chart.release" . }}-data
   labels:
     app: {{ include "epics-console-chart.release" . }}
-    beamline: {{ .Values.beamline }}
+    beamline: {{ .Values.beamline | quote}}
 spec:
   accessModes:
     - ReadWriteOnce

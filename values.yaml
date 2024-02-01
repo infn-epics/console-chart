@@ -28,3 +28,4 @@ securityContext:
 autosaveClaim:
 # use the shared PVC to share data
 dataClaim:
+beamline:
