@@ -28,13 +28,11 @@ spec:
     {{ if .Values.opi.init }}
       initContainers:
       - name: init-volume
-        image: alpine:latest
+        image: baltig.infn.it:4567/epics-containers/container-init
         command: 
         - sh 
         - -c
-        - |
-          apk --no-cache add git
-        
+        - |        
           rm -rf /tmp/*
           cd /tmp
           if [ -n "{{ .Values.opi.branch }}" ];then
