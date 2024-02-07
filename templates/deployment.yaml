@@ -1,49 +1,46 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "epics-console-chart.release" . }}
   labels:
     app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
     app.kubernetes.io/instance: {{ include "epics-console-chart.release" . }}
     beamline: {{ .Values.beamline | quote }}
-
 spec:
+  serviceName: "{{ .Values.serviceName }}"
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
       app.kubernetes.io/instance: {{ include "epics-console-chart.release" . }}
-
   template:
     metadata:
       labels:
         app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
         app.kubernetes.io/instance: {{ include "epics-console-chart.release" . }}
-
     spec:
       {{ if ne .Values.serviceAccountName "" }}
       serviceAccountName: {{ .Values.serviceAccountName | quote }}
       {{ end }}
       hostNetwork: {{ .Values.hostNetwork | quote }}
-    {{ if .Values.opi.init }}
       initContainers:
       - name: init-volume
         image: baltig.infn.it:4567/epics-containers/container-init
-        command: 
-        - sh 
+        command:
+        - sh
         - -c
-        - |        
+        - |
           rm -rf /tmp/*
           cd /tmp
-          if [ -n "{{ .Values.opi.branch }}" ];then
+          if [ -n "{{ .Values.opi.branch }}" ]; then
             git clone -b {{ .Values.opi.branch }} {{ .Values.opi.url }} --recurse-submodules opi-repo
           else
             git clone {{ .Values.opi.url }} --recurse-submodules opi-repo
           fi
 
-          if [ -d opi-repo/{{ .Values.opi.path}} ];then
-            if [ "{{ .Values.opi.path }}" == "." ];then
-                ln -sf opi-repo opi
+          if [ -d opi-repo/{{ .Values.opi.path}} ]; then
+            if [ "{{ .Values.opi.path }}" == "." ]; then
+              ln -sf opi-repo opi
             else
               ln -sf opi-repo/{{ .Values.opi.path}} opi
             fi
@@ -60,71 +57,61 @@ spec:
           mountPath: /autosave
         - name: data-volume
           mountPath: /data
-    {{ end }}
-
       containers:
         - name: epics-console
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.imagePullPolicy }}
-
           ports:
             - containerPort: 80
             - containerPort: 5900
           securityContext:
             privileged: true
-        {{- if .Values.configCA.existingConfigMap }}
-        envFrom:
-          - configMapRef:
-              name: {{ .Values.configCA.existingConfigMap }}
-        {{- end }}
+          {{- if .Values.configCA.existingConfigMap }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.configCA.existingConfigMap }}
+          {{- end }}
           env:
-          - name: OPIHOME
-            value: /phoebus/interface/opi
-          - name: OPIDATA
-            value: /data/opi
-          - name: OPISTART
-            value: {{ .Values.opi.exec | quote }}
-  
-          {{ if .Values.env  }}
-          {{- range $envVar := .Values.env }}
-          - name: {{ $envVar.name }}
-            value: {{ $envVar.value | quote }}
-          {{- end }}
-          {{- end }}
+            - name: OPIHOME
+              value: /phoebus/interface/opi
+            - name: OPIDATA
+              value: /data/opi
+            - name: OPISTART
+              value: {{ .Values.opi.exec | quote }}
+            {{ if .Values.env }}
+            {{- range $envVar := .Values.env }}
+            - name: {{ $envVar.name }}
+              value: {{ $envVar.value | quote }}
+            {{- end }}
+            {{- end }}
           volumeMounts:
-          - name: x11-socket
-            mountPath: /tmp/.X11-unix
-          - name: opis-volume
-            mountPath: /phoebus/interface
-          - name: autosave-volume
-            mountPath: /autosave
-          - name: data-volume
-            mountPath: /data
-      volumes:
-        - name: x11-socket
-          hostPath:
-            path: /tmp/.X11-unix
-        {{- if .Values.opi.claim }}
-        - name: opis-volume
-          persistentVolumeClaim:
-            claimName: {{ .Values.opi.claim }}
-        {{- else }}
-        - name: opis-volume
-          persistentVolumeClaim:
-            claimName: {{ include "epics-console-chart.release" . }}-opi
-        {{- end }}
-        - name: autosave-volume
-          persistentVolumeClaim:
-            {{- if .Values.autosave }}
-            claimName: {{ .Values.autosave }}
-            {{- else }}
-            claimName: {{ include "epics-console-chart.release" . }}-autosave
-            {{- end }}
-        - name: data-volume
-          persistentVolumeClaim:
-            {{- if .Values.dataClaim }}
-            claimName: {{ .Values.dataClaim }}
-            {{- else }}
-            claimName: {{ include "epics-console-chart.release" . }}-data
-            {{- end }}
-        
+            - name: x11-socket
+              mountPath: /tmp/.X11-unix
+            - name: opis-volume
+              mountPath: /phoebus/interface
+            - name: autosave-volume
+              mountPath: /autosave
+            - name: data-volume
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: opis-volume
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+    - metadata:
+        name: autosave-volume
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+    - metadata:
+        name: data-volume
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
