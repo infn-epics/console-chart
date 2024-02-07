@@ -85,8 +85,6 @@ spec:
             {{- end }}
             {{- end }}
           volumeMounts:
-            - name: x11-socket
-              mountPath: /tmp/.X11-unix
             - name: opis-volume
               mountPath: /phoebus/interface
             - name: autosave-volume
