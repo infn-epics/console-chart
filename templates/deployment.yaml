@@ -8,7 +8,7 @@ metadata:
     beamline: {{ .Values.beamline | quote }}
 
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}

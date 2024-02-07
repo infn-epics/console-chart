@@ -5,7 +5,7 @@ image:
   imagePullPolicy: Always
 
 
-
+replicaCount: 1
 route:
   enabled: true ## enable the route (for openshift)
   host: apps.okd-datest.lnf.infn.it ## host name namespace
