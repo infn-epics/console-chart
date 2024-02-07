@@ -72,6 +72,11 @@ spec:
             - containerPort: 5900
           securityContext:
             privileged: true
+        {{- if .Values.configCA.existingConfigMap }}
+        envFrom:
+          - configMapRef:
+              name: {{ .Values.configCA.existingConfigMap }}
+        {{- end }}
           env:
           - name: OPIHOME
             value: /phoebus/interface/opi
