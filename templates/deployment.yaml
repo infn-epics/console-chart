@@ -22,6 +22,8 @@ spec:
       {{ if ne .Values.serviceAccountName "" }}
       serviceAccountName: {{ .Values.serviceAccountName | quote }}
       {{ end }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
       hostNetwork: {{ .Values.hostNetwork | quote }}
       initContainers:
       - name: init-volume
@@ -64,8 +66,7 @@ spec:
           ports:
             - containerPort: 80
             - containerPort: 5900
-          securityContext:
-            privileged: true
+          
           {{- if .Values.configCA.existingConfigMap }}
           envFrom:
             - configMapRef:
