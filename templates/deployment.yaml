@@ -50,7 +50,7 @@ spec:
             ln -sf opi-repo opi
           fi
           mkdir -p /data/opi /autosave/opi
-          chmod a+w,a+r -R /tmp /data /autosave
+          # chmod a+w,a+r -R /tmp /data /autosave
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: opis-volume
