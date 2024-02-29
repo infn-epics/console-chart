@@ -1,53 +1,19 @@
 # epics-console-chart/templates/service.yaml
-{{- if .Values.ingress.enabled -}}
-{{- $fullName := include "epics-console-chart.fullname" . -}}
-
-kind: Ingress
-apiVersion: networking.k8s.io/v1
+apiVersion: v1
+kind: Service
 metadata:
-  name: {{ $fullName }}
+  name: {{ include "epics-console-chart.fullname" . }}
   labels:
-    {{- include "epics-console.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}-service
+    app.kubernetes.io/instance: {{ include "epics-console-chart.release" . }}-service
 spec:
-  {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
-  ingressClassName: {{ .Values.ingress.className }}
-  {{- end }}
-  {{- if .Values.ingress.tls }}
-  tls:
-    {{- range .Values.ingress.tls }}
-    - hosts:
-        {{- range .hosts }}
-        - {{ . | quote }}
-        {{- end }}
-      secretName: {{ .secretName }}
-    {{- end }}
-  {{- end }}
-  rules:
-    {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
-      http:
-        paths:
-          {{- range .paths }}
-          - path: {{ .path }}
-            {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
-            pathType: {{ .pathType }}
-            {{- end }}
-            backend:
-              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
-              service:
-                name: {{ $fullName }}
-                port:
-                  number: 80
-              {{- else }}
-              serviceName: {{ $fullName }}
-              servicePort: 80
-              {{- end }}
-          {{- end }}
-    {{- end }}
-{{- end }}
-
-
+  ports:
+    - name: novnc
+      port: 80
+      targetPort: 80
+    - name: vnc
+      port: 5900
+      targetPort: 5900
+  selector:
+    app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
+    app.kubernetes.io/instance: {{ include "epics-console-chart.release" . }}
