@@ -1,7 +1,11 @@
 # epics-console-chart/templates/_helpers.tpl
 {{- define "epics-console-chart.fullname" -}}
-{{- printf "%s-%s" .Release.Name .Chart.Name }}
-{{- end -}}
+{{- if .Values.fullnameOverride }}
+{{- .Values.fullnameOverride | default "" | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
 
 {{- define "epics-console-chart.name" -}}
 {{- .Chart.Name }}
