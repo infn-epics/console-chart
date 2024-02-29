@@ -1,12 +1,10 @@
 Thank you for using epics-console-chart!
 
-{{- if .Values.route.enabled -}}
-{{- if .Values.route.host -}}
-To access the EPICS console, use the following URL:
-http://{{ .Release.Name }}.{{ .Values.route.host }}
-{{- else }}
-Missing host namespace, route.host no route created
-{{- end }}
+{{- if .Values.ingress.enabled -}}
+    {{- range .Values.ingress.hosts }}
+    To access the EPICS console, use the following URL:
+    http://{{ .host }}
+    {{- end}}
 {{- else }}
 No route enabled console not very useful
 {{- end }}
