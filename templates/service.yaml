@@ -2,8 +2,8 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "epics-console-chart.fullname" . -}}
 
-apiVersion: extensions/v1beta1
 kind: Ingress
+apiVersion: extensions/v1beta1
 metadata:
   name: {{ $fullName }}
   labels:
