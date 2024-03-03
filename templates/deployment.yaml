@@ -19,7 +19,7 @@ spec:
         app.kubernetes.io/name: {{ include "epics-console-chart.name" . }}
         app.kubernetes.io/instance: {{ include "epics-console-chart.release" . }}
     spec:
-      {{ if ne .Values.serviceAccountName "" }}
+      {{ if .Values.serviceAccountName }}
       serviceAccountName: {{ .Values.serviceAccountName | quote }}
       {{ end }}
       securityContext:
@@ -72,6 +72,7 @@ spec:
             - configMapRef:
                 name: {{ .Values.configCA.existingConfigMap }}
           {{- end }}
+
           env:
             - name: OPIHOME
               value: /phoebus/interface/opi
@@ -79,12 +80,19 @@ spec:
               value: /data/opi
             - name: OPISTART
               value: {{ .Values.opi.exec | quote }}
+            {{- if .Values.configCA.address_list }}
+            - name: EPICS_CA_ADDR_LIST
+              value: {{ .Values.configCA.address_list | quote }}
+            - name: EPICS_CA_AUTO_ADDR_LIST
+              value: "NO"
+            {{- end }}
             {{ if .Values.env }}
             {{- range $envVar := .Values.env }}
             - name: {{ $envVar.name }}
               value: {{ $envVar.value | quote }}
             {{- end }}
             {{- end }}
+
           volumeMounts:
             - name: opis-volume
               mountPath: /phoebus/interface
