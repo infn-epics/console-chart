@@ -75,7 +75,7 @@ spec:
 
           env:
             - name: OPIHOME
-              value: /phoebus/interface/opi
+              value: /phoebus/opi
             - name: OPIDATA
               value: /data/opi
             - name: OPISTART
@@ -95,7 +95,7 @@ spec:
 
           volumeMounts:
             - name: opis-volume
-              mountPath: /phoebus/interface
+              mountPath: /phoebus/opi
             - name: autosave-volume
               mountPath: /autosave
             - name: data-volume

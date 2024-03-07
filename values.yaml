@@ -1,7 +1,7 @@
 # epics-console-chart/values.yaml
 image:
   repository: baltig.infn.it:4567/epics-containers/epics-docker-console
-  tag: latest
+  tag: 2024.3.7-4.7.4
   imagePullPolicy: Always
 
 
