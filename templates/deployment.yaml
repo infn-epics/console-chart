@@ -42,15 +42,14 @@ spec:
 
           if [ -d opi-repo/{{ .Values.opi.path}} ]; then
             if [ "{{ .Values.opi.path }}" == "." ]; then
-              ln -sf opi-repo opi
+              mv opi-repo opi
             else
-              ln -sf opi-repo/{{ .Values.opi.path}} opi
+              mv opi-repo/{{ .Values.opi.path}} opi
             fi
           else
-            ln -sf opi-repo opi
+            mv opi-repo opi
           fi
           mkdir -p /data/opi /autosave/opi
-          # chmod a+w,a+r -R /tmp /data /autosave
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: opis-volume
@@ -75,7 +74,7 @@ spec:
 
           env:
             - name: OPIHOME
-              value: /phoebus/opi
+              value: /phoebus/opi/opi
             - name: OPIDATA
               value: /data/opi
             - name: OPISTART
