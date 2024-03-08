@@ -79,6 +79,11 @@ spec:
               value: /data/opi
             - name: OPISTART
               value: {{ .Values.opi.exec | quote }}
+            {{- if .Values.epicsConfiguration.name }}
+            - name: PHOEBUSINI
+              value: /phoebus/phoebus_settings.ini
+            {{- end}}
+  
             {{- if .Values.epicsConfiguration.gateway }}
             - name: EPICS_CA_ADDR_LIST
               value: {{ .Values.epicsConfiguration.gateway | quote }}
@@ -99,6 +104,20 @@ spec:
               mountPath: /autosave
             - name: data-volume
               mountPath: /data
+            {{- if .Values.epicsConfiguration.name }}
+
+            - name: epicsconfig-volume
+              mountPath: /phoebus
+              subPath: phoebus_settings.ini  # Specify the filename you want to mount
+            {{- end }}
+
+  {{- if .Values.epicsConfiguration.name }}
+  volumes:
+  - name: epicsconfig-volume
+    configMap:
+      name: {{ .Values.epicsConfiguration.name }}
+  {{- end }}
+
   volumeClaimTemplates:
     - metadata:
         name: opis-volume
