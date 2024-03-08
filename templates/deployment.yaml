@@ -66,12 +66,12 @@ spec:
             - containerPort: 80
             - containerPort: 5900
           
-          {{- if .Values.configCA.existingConfigMap }}
+          {{- if .Values.epicsConfiguration.name }}
           envFrom:
             - configMapRef:
-                name: {{ .Values.configCA.existingConfigMap }}
+                name: {{ .Values.epicsConfiguration.name }}
           {{- end }}
-
+            
           env:
             - name: OPIHOME
               value: /phoebus/opi/opi
@@ -79,9 +79,9 @@ spec:
               value: /data/opi
             - name: OPISTART
               value: {{ .Values.opi.exec | quote }}
-            {{- if .Values.configCA.address_list }}
+            {{- if .Values.epicsConfiguration.gateway }}
             - name: EPICS_CA_ADDR_LIST
-              value: {{ .Values.configCA.address_list | quote }}
+              value: {{ .Values.epicsConfiguration.gateway | quote }}
             - name: EPICS_CA_AUTO_ADDR_LIST
               value: "NO"
             {{- end }}
