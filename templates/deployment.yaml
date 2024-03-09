@@ -104,19 +104,15 @@ spec:
               mountPath: /autosave
             - name: data-volume
               mountPath: /data
-            {{- if .Values.epicsConfiguration.name }}
-
+{{- if .Values.epicsConfiguration.name }}
             - name: epicsconfig-volume
               mountPath: /phoebus
               subPath: phoebus_settings.ini  # Specify the filename you want to mount
-            {{- end }}
-
-  {{- if .Values.epicsConfiguration.name }}
   volumes:
   - name: epicsconfig-volume
     configMap:
       name: {{ .Values.epicsConfiguration.name }}
-  {{- end }}
+{{- end }}
 
   volumeClaimTemplates:
     - metadata:
