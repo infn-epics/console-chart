@@ -113,7 +113,7 @@ spec:
           configMap:
             name: {{ .Values.epicsConfiguration.name }}
 {{- end }}
-  volumeClaimTemplates:
+volumeClaimTemplates:
     - metadata:
         name: opis-volume
       spec:
