@@ -110,10 +110,6 @@ spec:
               subPath: phoebus_settings.ini  # Specify the filename you want to mount
 
 {{- end }}
-  volumes:
-  - name: epicsconfig-volume
-    configMap:
-      name: {{ .Values.epicsConfiguration.name }}
   volumeClaimTemplates:
     - metadata:
         name: opis-volume
@@ -136,3 +132,7 @@ spec:
         resources:
           requests:
             storage: 1Gi
+  volumes:
+  - name: epicsconfig-volume
+    configMap:
+      name: {{ .Values.epicsConfiguration.name }}
