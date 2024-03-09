@@ -105,11 +105,11 @@ spec:
             - name: data-volume
               mountPath: /data
 {{- if .Values.epicsConfiguration.name }}
-            - name: epicsconfig-volumeee
-              mountPath: /phoebus
+            - name: epicsconfig-volume
+              mountPath: /phoebus/phoebus_settings.ini
               subPath: phoebus_settings.ini  # Specify the filename you want to mount
       volumes:
-        - name: epicsconfig-volumeee
+        - name: epicsconfig-volume
           configMap:
             name: {{ .Values.epicsConfiguration.name }}
 {{- end }}
