@@ -10,7 +10,7 @@ route:
   enabled: true ## enable the route (for openshift)
   host: apps.okd-datest.lnf.infn.it ## host name namespace
 
-opi:
+gitRepoConfig:
   exec: start.sh
   claim: ## an existing claim
   init: true

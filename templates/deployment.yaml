@@ -34,17 +34,18 @@ spec:
         - |
           rm -rf /tmp/*
           cd /tmp
-          if [ -n "{{ .Values.opi.branch }}" ]; then
-            git clone -b {{ .Values.opi.branch }} {{ .Values.opi.url }} --recurse-submodules opi-repo
+          echo "repository {{ .Values.gitRepoConfig.url }} branch {{ .Values.gitRepoConfig.branch }}"
+          if [ -n "{{ .Values.gitRepoConfig.branch }}" ]; then
+            git clone -b {{ .Values.gitRepoConfig.branch }} {{ .Values.gitRepoConfig.url }} --recurse-submodules opi-repo
           else
-            git clone {{ .Values.opi.url }} --recurse-submodules opi-repo
+            git clone {{ .Values.gitRepoConfig.url }} --recurse-submodules opi-repo
           fi
 
-          if [ -d opi-repo/{{ .Values.opi.path}} ]; then
-            if [ "{{ .Values.opi.path }}" == "." ]; then
+          if [ -d opi-repo/{{ .Values.gitRepoConfig.path}} ]; then
+            if [ "{{ .Values.gitRepoConfig.path }}" == "." ]; then
               mv opi-repo opi
             else
-              mv opi-repo/{{ .Values.opi.path}} opi
+              mv opi-repo/{{ .Values.gitRepoConfig.path}} opi
             fi
           else
             mv opi-repo opi
@@ -78,7 +79,7 @@ spec:
             - name: OPIDATA
               value: /data/opi
             - name: OPISTART
-              value: {{ .Values.opi.exec | quote }}
+              value: {{ .Values.gitRepoConfig.exec | quote }}
             {{- if .Values.epicsConfiguration.name }}
             - name: PHOEBUSINI
               value: /phoebus/phoebus_settings.ini
