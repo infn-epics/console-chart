@@ -96,7 +96,8 @@ spec:
               value: {{ $envVar.value | quote }}
             {{- end }}
             {{- end }}
-
+          resources:
+          {{  toYaml .Values.resources | indent 10}}
           volumeMounts:
             - name: opis-volume
               mountPath: /phoebus/opi
