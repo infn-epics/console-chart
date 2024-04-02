@@ -97,7 +97,7 @@ spec:
             {{- end }}
             {{- end }}
           resources:
-          {{-  toYaml .Values.resources | indent 8}}
+{{ toYaml .Values.resources | indent 12}}
           volumeMounts:
             - name: opis-volume
               mountPath: /phoebus/opi
