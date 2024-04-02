@@ -9,8 +9,8 @@ Thank you for using epics-console-chart!
 No route enabled console not very useful
 {{- end }}
 
-{{ if .Values.opi.configMapName  }}
-mapping {{.Values.opi.configMapName }}
+{{ if .Values.gitRepoConfig.configMapName  }}
+mapping {{.Values.gitRepoConfig.configMapName }}
 {{- else }}
 no opi configuration specified
 {{- end }}
