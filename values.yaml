@@ -18,6 +18,7 @@ gitRepoConfig:
   path: .
   branch: main
 
+opimain: ### name of the bob to launch 
 serviceAccountName: default
 
 securityContext:

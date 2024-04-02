@@ -84,6 +84,10 @@ spec:
             - name: PHOEBUSINI
               value: /phoebus/phoebus_settings.ini
             {{- end}}
+            {{- if .Values.opimain }}
+            - name: OPIMAIN
+              value: {{.Values.opimain}}
+            {{- end}}
   
             {{- if .Values.epicsConfiguration.gateway }}
             - name: EPICS_CA_ADDR_LIST
