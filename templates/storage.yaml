@@ -1,34 +1,4 @@
 
 
-{{- if not .Values.autosaveClaim }}
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ include "epics-console-chart.release" . }}-autosave
-  labels:
-    app: {{ include "epics-console-chart.release" . }}
-    beamline: {{ .Values.beamline | quote}}
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
-{{- end }}
 
-{{- if not .Values.dataClaim }}
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ include "epics-console-chart.release" . }}-data
-  labels:
-    app: {{ include "epics-console-chart.release" . }}
-    beamline: {{ .Values.beamline | quote}}
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-{{- end }}
+
