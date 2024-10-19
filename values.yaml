@@ -41,6 +41,8 @@ epicsConfiguration:
 
 resources: {}
 
+staticIP:
+
 ingress:
   enabled: true
   className: ""

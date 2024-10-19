@@ -1,19 +1,4 @@
-{{- if not .Values.gitRepoConfig.claim }}
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ include "epics-console-chart.release" . }}-opi
-  labels:
-    app: {{ include "epics-console-chart.release" . }}
-    beamline: {{ .Values.beamline | quote }}
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
-{{- end }}
+
 
 {{- if not .Values.autosaveClaim }}
 apiVersion: v1
