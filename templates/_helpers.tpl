@@ -21,6 +21,8 @@ helm.sh/chart: {{ include "epics-console.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+beamline: {{ .Values.beamline | quote }}
+
 {{- end }}
 
 {{- define "epics-console.selectorLabels" -}}
