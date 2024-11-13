@@ -35,10 +35,20 @@ spec:
           rm -rf /tmp/*
           cd /tmp
           echo "repository {{ .Values.gitRepoConfig.url }} branch {{ .Values.gitRepoConfig.branch }}"
-          if [ -n "{{ .Values.gitRepoConfig.branch }}" ]; then
-            git clone -b {{ .Values.gitRepoConfig.branch }} {{ .Values.gitRepoConfig.url }} --recurse-submodules opi-repo
+          if [ -n "{{ .Values.gitRepoConfig.token }}" ]; then
+            echo "Cloning repository using Personal Access Token"
+            if [ -n "{{ .Values.gitRepoConfig.branch }}" ]; then
+              git clone --depth 1 -b {{ .Values.gitRepoConfig.branch }} https://oauth2:{{ .Values.gitRepoConfig.token }}@{{ .Values.gitRepoConfig.url | replace "https://" "" }} --recurse-submodules opi-repo
+            else
+              git clone --depth 1 https://oauth2:{{ .Values.gitRepoConfig.token }}@{{ .Values.gitRepoConfig.url | replace "https://" "" }} --recurse-submodules opi-repo
+            fi
           else
-            git clone {{ .Values.gitRepoConfig.url }} --recurse-submodules opi-repo
+
+            if [ -n "{{ .Values.gitRepoConfig.branch }}" ]; then
+              git clone --depth 1 -b {{ .Values.gitRepoConfig.branch }} {{ .Values.gitRepoConfig.url }} --recurse-submodules opi-repo
+            else
+              git clone --depth 1 {{ .Values.gitRepoConfig.url }} --recurse-submodules opi-repo
+            fi
           fi
 
           if [ -d opi-repo/{{ .Values.gitRepoConfig.path}} ]; then
@@ -118,15 +128,11 @@ spec:
         - name: epicsconfig-volume
           configMap:
             name: {{ .Values.epicsConfiguration.name }}
+        - name: opis-volume
+          emptyDir: {}
 {{- end }}
   volumeClaimTemplates:
-    - metadata:
-        name: opis-volume
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 1Gi
+    
     - metadata:
         name: autosave-volume
       spec:
