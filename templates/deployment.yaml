@@ -38,28 +38,19 @@ spec:
           if [ -n "{{ .Values.gitRepoConfig.token }}" ]; then
             echo "Cloning repository using Personal Access Token"
             if [ -n "{{ .Values.gitRepoConfig.branch }}" ]; then
-              git clone --depth 1 -b {{ .Values.gitRepoConfig.branch }} https://oauth2:{{ .Values.gitRepoConfig.token }}@{{ .Values.gitRepoConfig.url | replace "https://" "" }} --recurse-submodules opi-repo
+              git clone -b {{ .Values.gitRepoConfig.branch }} https://oauth2:{{ .Values.gitRepoConfig.token }}@{{ .Values.gitRepoConfig.url | replace "https://" "" }} --recurse-submodules opi-repo
             else
-              git clone --depth 1 https://oauth2:{{ .Values.gitRepoConfig.token }}@{{ .Values.gitRepoConfig.url | replace "https://" "" }} --recurse-submodules opi-repo
+              git clone https://oauth2:{{ .Values.gitRepoConfig.token }}@{{ .Values.gitRepoConfig.url | replace "https://" "" }} --recurse-submodules beamline-repo
             fi
           else
 
             if [ -n "{{ .Values.gitRepoConfig.branch }}" ]; then
-              git clone --depth 1 -b {{ .Values.gitRepoConfig.branch }} {{ .Values.gitRepoConfig.url }} --recurse-submodules opi-repo
+              git clone -b {{ .Values.gitRepoConfig.branch }} {{ .Values.gitRepoConfig.url }} --recurse-submodules beamline-repo
             else
-              git clone --depth 1 {{ .Values.gitRepoConfig.url }} --recurse-submodules opi-repo
+              git clone {{ .Values.gitRepoConfig.url }} --recurse-submodules beamline-repo
             fi
           fi
 
-          if [ -d opi-repo/{{ .Values.gitRepoConfig.path}} ]; then
-            if [ "{{ .Values.gitRepoConfig.path }}" == "." ]; then
-              mv opi-repo opi
-            else
-              mv opi-repo/{{ .Values.gitRepoConfig.path}} opi
-            fi
-          else
-            mv opi-repo opi
-          fi
           mkdir -p /data/opi /autosave/opi
         imagePullPolicy: IfNotPresent
         volumeMounts:
@@ -85,7 +76,7 @@ spec:
             
           env:
             - name: OPIHOME
-              value: /phoebus/opi/opi
+              value: /phoebus/opi/beamline-repo/opi
             - name: OPIDATA
               value: /data/opi
             - name: OPISTART
