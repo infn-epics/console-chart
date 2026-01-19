@@ -17,6 +17,7 @@ gitRepoConfig:
   url: https://baltig.infn.it/lnf-da-control/sparc-epics-opi.git
   path: .
   branch: main
+  ansiblePlaybook: configure-epics-consoles.yml  ## Ansible playbook to run for console configuration
 
 opimain: ### name of the bob to launch 
 serviceAccountName: default
