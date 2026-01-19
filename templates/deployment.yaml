@@ -26,24 +26,35 @@ spec:
         {{- toYaml .Values.securityContext | nindent 8 }}
       hostNetwork: {{ .Values.hostNetwork | quote }}
       initContainers:
-      - name: init-volume
-        image: baltig.infn.it:4567/epics-containers/container-init
+      - name: init-console
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        {{- if .Values.epicsConfiguration.name }}
+        envFrom:
+          - configMapRef:
+              name: {{ .Values.epicsConfiguration.name }}
+        {{- end }}
+        env:
+          {{- if .Values.epicsConfiguration.name }}
+          - name: PHOEBUSINI
+            value: /phoebus/phoebus_settings.ini
+          {{- end }}
         command:
         - sh
         - -c
         - |
-          rm -rf /tmp/*
-          cd /tmp
-          echo "repository {{ .Values.gitRepoConfig.url }} branch {{ .Values.gitRepoConfig.branch }}"
+          echo "=== Initializing EPICS Console ==="
+          cd /phoebus
+          
+          echo "Cloning repository {{ .Values.gitRepoConfig.url }} branch {{ .Values.gitRepoConfig.branch }}"
           if [ -n "{{ .Values.gitRepoConfig.token }}" ]; then
-            echo "Cloning repository using Personal Access Token"
+            echo "Using Personal Access Token"
             if [ -n "{{ .Values.gitRepoConfig.branch }}" ]; then
-              git clone -b {{ .Values.gitRepoConfig.branch }} https://oauth2:{{ .Values.gitRepoConfig.token }}@{{ .Values.gitRepoConfig.url | replace "https://" "" }} --recurse-submodules opi-repo
+              git clone -b {{ .Values.gitRepoConfig.branch }} https://oauth2:{{ .Values.gitRepoConfig.token }}@{{ .Values.gitRepoConfig.url | replace "https://" "" }} --recurse-submodules beamline-repo
             else
               git clone https://oauth2:{{ .Values.gitRepoConfig.token }}@{{ .Values.gitRepoConfig.url | replace "https://" "" }} --recurse-submodules beamline-repo
             fi
           else
-
             if [ -n "{{ .Values.gitRepoConfig.branch }}" ]; then
               git clone -b {{ .Values.gitRepoConfig.branch }} {{ .Values.gitRepoConfig.url }} --recurse-submodules beamline-repo
             else
@@ -51,15 +62,34 @@ spec:
             fi
           fi
 
+          # Create data directories
           mkdir -p /data/opi /autosave/opi
-        imagePullPolicy: IfNotPresent
+
+          # Run Ansible playbook to configure the console
+          echo "=== Running Ansible playbook to configure console ==="
+          cd /phoebus/beamline-repo/opi/ansible
+          if [ -f localhost.yml ] && [ -f configure-consoles.yml ]; then
+            ansible-playbook -i localhost.yml configure-consoles.yml
+          elif [ -f localhost.yml ] && [ -f configure-epics-consoles.yml ]; then
+            ansible-playbook -i localhost.yml configure-epics-consoles.yml
+          else
+            echo "WARNING: Ansible playbook or localhost inventory not found, skipping configuration"
+            ls -la
+          fi
+          
+          echo "=== Console initialization complete ==="
         volumeMounts:
-        - name: opis-volume
-          mountPath: /tmp
+        - name: phoebus-volume
+          mountPath: /phoebus
         - name: autosave-volume
           mountPath: /autosave
         - name: data-volume
           mountPath: /data
+        {{- if .Values.epicsConfiguration.name }}
+        - name: phoebus-ini
+          mountPath: /phoebus/phoebus_settings.ini
+          subPath: phoebus_settings.ini
+        {{- end }}
       containers:
         - name: epics-console
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -76,7 +106,7 @@ spec:
             
           env:
             - name: OPIHOME
-              value: /phoebus/opi/beamline-repo/opi
+              value: /phoebus/beamline-repo/opi
             - name: OPIDATA
               value: /data/opi
             - name: OPISTART
@@ -105,23 +135,28 @@ spec:
           resources:
 {{ toYaml .Values.resources | indent 12}}
           volumeMounts:
-            - name: opis-volume
-              mountPath: /phoebus/opi
+            - name: phoebus-volume
+              mountPath: /phoebus
             - name: autosave-volume
               mountPath: /autosave
             - name: data-volume
               mountPath: /data
-{{- if .Values.epicsConfiguration.name }}
-            - name: epicsconfig-volume
+            {{- if .Values.epicsConfiguration.name }}
+            - name: phoebus-ini
               mountPath: /phoebus/phoebus_settings.ini
-              subPath: phoebus_settings.ini  # Specify the filename you want to mount
+              subPath: phoebus_settings.ini
+            {{- end }}
       volumes:
-        - name: epicsconfig-volume
+        - name: phoebus-volume
+          emptyDir: {}
+        {{- if .Values.epicsConfiguration.name }}
+        - name: phoebus-ini
           configMap:
             name: {{ .Values.epicsConfiguration.name }}
-        - name: opis-volume
-          emptyDir: {}
-{{- end }}
+            items:
+            - key: phoebus_settings.ini
+              path: phoebus_settings.ini
+        {{- end }}
   volumeClaimTemplates:
     
     - metadata:
