@@ -1,7 +1,7 @@
 # epics-console-chart/values.yaml
 image:
   repository: baltig.infn.it:4567/epics-containers/epics-docker-console
-  tag: 2024.3.7-4.7.4
+  tag: latest
   imagePullPolicy: Always
 
 
@@ -50,7 +50,7 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: console.apps.okd-datest.lnf.infn.it
+    - host: 
       paths:
         - path: /
           pathType: ImplementationSpecific
@@ -58,3 +58,4 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
