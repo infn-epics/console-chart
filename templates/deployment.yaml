@@ -46,7 +46,7 @@ spec:
         - sh
         - -c
         - |
-          echo "=== Initializing EPICS Console ==="
+          echo "=== Initializing EPICS Console - Git Clone ==="
           cd /phoebus
           
           echo "Cloning repository {{ .Values.gitRepoConfig.url }} branch {{ .Values.gitRepoConfig.branch }}"
@@ -67,38 +67,8 @@ spec:
 
           # Create data directories
           mkdir -p /data/opi /autosave/opi
-
-          # Run Ansible playbook to configure the console
-          echo "=== Running Ansible playbook to configure console ==="
-          cd /phoebus/beamline-repo/opi/ansible
           
-          # Create localhost.yml if it doesn't exist
-          if [ ! -f localhost.yml ]; then
-            echo "Creating localhost.yml inventory file..."
-            cat > localhost.yml << 'EOF'
-          all:
-            hosts:
-              localhost:
-                ansible_connection: local
-                ansible_python_interpreter: "{{ "{{" }} ansible_playbook_python {{ "}}" }}"
-                ansible_become_method: sudo
-                ansible_become_flags: "-H -S"
-                ansible_pipelining: true
-                skip_git_user_config: true
-          EOF
-          fi
-          
-          # Run the playbook
-          PLAYBOOK="{{ .Values.gitRepoConfig.ansiblePlaybook | default "configure-epics-consoles.yml" }}"
-          if [ -f "$PLAYBOOK" ]; then
-            echo "Running ansible-playbook -i localhost.yml $PLAYBOOK"
-            ansible-playbook -i localhost.yml "$PLAYBOOK"
-          else
-            echo "WARNING: Ansible playbook $PLAYBOOK not found, skipping configuration"
-            ls -la
-          fi
-          
-          echo "=== Console initialization complete ==="
+          echo "=== Git clone complete ==="
         volumeMounts:
         - name: phoebus-volume
           mountPath: /phoebus
@@ -132,6 +102,12 @@ spec:
               value: /data/opi
             - name: OPISTART
               value: {{ .Values.gitRepoConfig.exec | quote }}
+            {{- if .Values.gitRepoConfig.ansiblePlaybook }}
+            - name: ANSIBLE_PLAYBOOK
+              value: {{ .Values.gitRepoConfig.ansiblePlaybook | quote }}
+            - name: ANSIBLE_DIR
+              value: /phoebus/beamline-repo/opi/ansible
+            {{- end }}
             {{- if .Values.epicsConfiguration.name }}
             - name: PHOEBUSINI
               value: /phoebus/phoebus_settings.ini
