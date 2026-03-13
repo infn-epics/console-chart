@@ -123,7 +123,7 @@ spec:
             - name: EPICS_CA_AUTO_ADDR_LIST
               value: "NO"
             {{- end }}
-            {{ if .Values.env }}
+            {{- if .Values.env }}
             {{- range $envVar := .Values.env }}
             - name: {{ $envVar.name }}
               value: {{ $envVar.value | quote }}
