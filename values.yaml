@@ -1,6 +1,6 @@
 # epics-console-chart/values.yaml
 image:
-  repository: baltig.infn.it:4567/epics-containers/epics-docker-console
+  repository: ghcr.io/infn-epics/nox-ubuntu-console
   tag: latest
   imagePullPolicy: Always
 
@@ -8,7 +8,7 @@ image:
 replicaCount: 1
 route:
   enabled: true ## enable the route (for openshift)
-  host: apps.okd-datest.lnf.infn.it ## host name namespace
+  host:  ## host name namespace
 
 gitRepoConfig:
   exec: start.sh

@@ -13,13 +13,12 @@ The chart creates a StatefulSet that:
 
 ## Image Features
 
-The container image (`baltig.infn.it:4567/epics-containers/epics-docker-console`) includes:
-- **Phoebus** - CS-Studio replacement for EPICS control systems
-- **Java** (OpenJDK) - Required runtime for Phoebus
+The container image (`ghcr.io/infn-epics/nox-ubuntu-console`) includes:
+- **Ubuntu 24.04** LXDE desktop
 - **Ansible** - For automated console configuration
 - **Git** - For cloning OPI repositories
-- **VNC Server** - Remote desktop access
-- **Web-based VNC client** - Browser access on port 80
+- **VNC Server** (x11vnc) - Remote desktop access
+- **Web-based VNC client** (noVNC) - Browser access on port 80
 
 ## How It Works
 
@@ -28,13 +27,11 @@ The container image (`baltig.infn.it:4567/epics-containers/epics-docker-console`
 1. **Init Container** (`init-console`):
    - Uses the same image as the main container
    - Clones the specified OPI git repository to `/phoebus/beamline-repo`
-   - Navigates to `opi/ansible/` directory
-   - Executes Ansible playbook (`ansible-playbook -i localhost.yml configure-consoles.yml`)
    - Creates data directories
 
 2. **Main Container** (`epics-console`):
-   - Accesses the pre-configured environment
-   - Starts Phoebus with the specified OPI and settings
+   - Runs the Ansible playbook (`ANSIBLE_PLAYBOOK` / `ANSIBLE_DIR`) at startup to configure the console
+   - Starts the desktop environment with the specified OPI and settings
    - Runs VNC server for remote access
    - Uses persistent volumes for autosave and data
 
@@ -77,7 +74,7 @@ The `PHOEBUSINI` environment variable is automatically set to point to the mount
 
 ```yaml
 image:
-  repository: baltig.infn.it:4567/epics-containers/epics-docker-console
+  repository: ghcr.io/infn-epics/nox-ubuntu-console
   tag: latest
 
 gitRepoConfig:
