@@ -58,7 +58,8 @@ spec:
           git config --global include.path /etc/git-credentials/gitconfig
           auth_file="$(mktemp)"
           chmod 600 "$auth_file"
-          credentials="$(printf 'url=%s\n\n' "$archive_url" | git credential fill)"
+          credential_url={{ .Values.gitRepoConfig.archiveCredentialUrl | default .Values.gitRepoConfig.archiveUrl | quote }}
+          credentials="$(printf 'url=%s\n\n' "$credential_url" | git credential fill)"
           credential_host="$(printf '%s\n' "$credentials" | sed -n 's/^host=//p')"
           credential_user="$(printf '%s\n' "$credentials" | sed -n 's/^username=//p')"
           credential_password="$(printf '%s\n' "$credentials" | sed -n 's/^password=//p')"

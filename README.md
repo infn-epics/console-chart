@@ -27,7 +27,7 @@ The container image (`ghcr.io/infn-epics/nox-ubuntu-console`) includes:
 1. **Init Container** (`init-console`):
    - Uses the same image as the main container
    - If `gitRepoConfig.archiveUrl` is set, downloads and extracts that archive to `/phoebus/beamline-repo`; otherwise clones the configured Git repository there
-   - For private GitLab release archives, `git_credentials_secret` supplies credentials using the same per-URL-prefix format as ioc-chart
+   - For private GitLab release archives, `git_credentials_secret` supplies credentials using the same per-URL-prefix format as ioc-chart; `archiveCredentialUrl` can select the URL prefix when the archive URL itself uses another GitLab path
    - Creates data directories
 
 2. **Main Container** (`epics-console`):
@@ -82,6 +82,8 @@ gitRepoConfig:
   # Prefer a release archive when the console should run a released OPI snapshot.
   # The archive is fetched at pod initialization; restarting the pod fetches it again.
   archiveUrl: https://gitlab.example.com/group/project/-/releases/permalink/latest/downloads/opi.tar.gz
+  # Optional URL used only to look up credentials for archiveUrl.
+  # archiveCredentialUrl: https://gitlab.example.com/group/project
   url: https://your-git-server.com/your-opi-repo.git
   branch: main
   exec: start.sh
