@@ -19,6 +19,10 @@ gitRepoConfig:
   branch: main
   ansiblePlaybook: configure-epics-consoles.yml  ## Ansible playbook to run for console configuration
 
+# Secret with per-URL-prefix git tokens (gitconfig key), used by the clone init
+# container for private repos and submodules. Same format as ioc-chart.
+# git_credentials_secret: epik8s-git-credentials
+
 opimain: ### name of the bob to launch 
 serviceAccountName: default
 

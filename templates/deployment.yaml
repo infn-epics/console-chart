@@ -46,8 +46,13 @@ spec:
         - sh
         - -c
         - |
+          set -e
           echo "=== Initializing EPICS Console - Git Clone ==="
           cd /phoebus
+          {{- if .Values.git_credentials_secret }}
+          # Per-URL-prefix tokens (gitconfig key of the git_credentials_secret Secret); ignored by git if absent
+          git config --global include.path /etc/git-credentials/gitconfig
+          {{- end }}
           
           echo "Cloning repository {{ .Values.gitRepoConfig.url }} branch {{ .Values.gitRepoConfig.branch }}"
           if [ -n "{{ .Values.gitRepoConfig.token }}" ]; then
@@ -76,6 +81,11 @@ spec:
           mountPath: /autosave
         - name: data-volume
           mountPath: /data
+        {{- if .Values.git_credentials_secret }}
+        - name: git-credentials
+          mountPath: /etc/git-credentials
+          readOnly: true
+        {{- end }}
         {{- if .Values.epicsConfiguration.name }}
         - name: phoebus-ini
           mountPath: /phoebus/phoebus_settings.ini
@@ -146,6 +156,13 @@ spec:
       volumes:
         - name: phoebus-volume
           emptyDir: {}
+        {{- if .Values.git_credentials_secret }}
+        - name: git-credentials
+          secret:
+            secretName: {{ .Values.git_credentials_secret | quote }}
+            optional: true
+            defaultMode: 0444
+        {{- end }}
         {{- if .Values.epicsConfiguration.name }}
         - name: phoebus-ini
           configMap:
