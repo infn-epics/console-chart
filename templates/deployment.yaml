@@ -46,11 +46,46 @@ spec:
         - sh
         - -c
         - |
-          set -e
+          set -eu
+          echo "=== Initializing EPICS Console - OPI setup ==="
+          cd /phoebus
+          {{- if .Values.gitRepoConfig.archiveUrl }}
+          archive_url={{ .Values.gitRepoConfig.archiveUrl | quote }}
+          archive_file="$(mktemp)"
+          auth_file=""
+          trap 'rm -f "$archive_file" ${auth_file:+"$auth_file"}' EXIT
+          {{- if .Values.git_credentials_secret }}
+          git config --global include.path /etc/git-credentials/gitconfig
+          auth_file="$(mktemp)"
+          chmod 600 "$auth_file"
+          credentials="$(printf 'url=%s\n\n' "$archive_url" | git credential fill)"
+          credential_host="$(printf '%s\n' "$credentials" | sed -n 's/^host=//p')"
+          credential_user="$(printf '%s\n' "$credentials" | sed -n 's/^username=//p')"
+          credential_password="$(printf '%s\n' "$credentials" | sed -n 's/^password=//p')"
+          if [ -z "$credential_host" ] || [ -z "$credential_user" ] || [ -z "$credential_password" ]; then
+            echo "Git credentials were not found for the release archive URL" >&2
+            exit 1
+          fi
+          printf 'machine %s login %s password %s\n' "$credential_host" "$credential_user" "$credential_password" > "$auth_file"
+          unset credentials credential_host credential_user credential_password
+          {{- end }}
+          echo "Downloading OPI release archive from $archive_url"
+          {{- if .Values.git_credentials_secret }}
+          curl --fail --location --silent --show-error --netrc-file "$auth_file" "$archive_url" --output "$archive_file"
+          {{- else }}
+          curl --fail --location --silent --show-error "$archive_url" --output "$archive_file"
+          {{- end }}
+          mkdir -p /phoebus/beamline-repo
+          tar -xzf "$archive_file" -C /phoebus/beamline-repo
+          if [ ! -d /phoebus/beamline-repo/opi ]; then
+            echo "Release archive does not contain the expected opi/ directory" >&2
+            exit 1
+          fi
+          echo "=== OPI release archive extracted ==="
+          {{- else }}
           echo "=== Initializing EPICS Console - Git Clone ==="
           cd /phoebus
           {{- if .Values.git_credentials_secret }}
-          # Per-URL-prefix tokens (gitconfig key of the git_credentials_secret Secret); ignored by git if absent
           git config --global include.path /etc/git-credentials/gitconfig
           {{- end }}
           
@@ -69,11 +104,12 @@ spec:
               git clone {{ .Values.gitRepoConfig.url }} --recurse-submodules beamline-repo
             fi
           fi
+          {{- end }}
 
           # Create data directories
           mkdir -p /data/opi /autosave/opi
           
-          echo "=== Git clone complete ==="
+          echo "=== OPI setup complete ==="
         volumeMounts:
         - name: phoebus-volume
           mountPath: /phoebus

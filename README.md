@@ -6,7 +6,7 @@ This Helm chart deploys an EPICS console with Phoebus installed that can be acce
 
 The chart creates a StatefulSet that:
 - Uses a console container image with Phoebus, Java, and Ansible pre-installed
-- Clones an OPI (Operator Interface) repository during initialization
+- Fetches an OPI release archive during initialization, or clones a repository when no archive URL is configured
 - Runs Ansible playbook to configure the console environment automatically
 - Mounts the OPI files and configuration into the running container
 - Provides persistent volumes for autosave and data storage
@@ -26,7 +26,8 @@ The container image (`ghcr.io/infn-epics/nox-ubuntu-console`) includes:
 
 1. **Init Container** (`init-console`):
    - Uses the same image as the main container
-   - Clones the specified OPI git repository to `/phoebus/beamline-repo`
+   - If `gitRepoConfig.archiveUrl` is set, downloads and extracts that archive to `/phoebus/beamline-repo`; otherwise clones the configured Git repository there
+   - For private GitLab release archives, `git_credentials_secret` supplies credentials using the same per-URL-prefix format as ioc-chart
    - Creates data directories
 
 2. **Main Container** (`epics-console`):
@@ -37,7 +38,7 @@ The container image (`ghcr.io/infn-epics/nox-ubuntu-console`) includes:
 
 ### Volume Mounts
 
-- `/phoebus` - EmptyDir volume containing cloned repository and Phoebus installation
+- `/phoebus` - EmptyDir volume containing the extracted release archive or cloned repository and Phoebus installation
 - `/autosave` - Persistent volume for autosave files (PVC)
 - `/data` - Persistent volume for data storage (PVC)
 - `/phoebus/phoebus_settings.ini` - Optional ConfigMap mount for Phoebus configuration
@@ -78,9 +79,15 @@ image:
   tag: latest
 
 gitRepoConfig:
+  # Prefer a release archive when the console should run a released OPI snapshot.
+  # The archive is fetched at pod initialization; restarting the pod fetches it again.
+  archiveUrl: https://gitlab.example.com/group/project/-/releases/permalink/latest/downloads/opi.tar.gz
   url: https://your-git-server.com/your-opi-repo.git
   branch: main
   exec: start.sh
+
+# Optional Secret containing gitconfig and per-URL-prefix credential files.
+# git_credentials_secret: epik8s-git-credentials
 
 epicsConfiguration:
   name: my-epics-config
