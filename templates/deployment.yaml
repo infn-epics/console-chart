@@ -149,6 +149,10 @@ spec:
               value: /data/opi
             - name: OPISTART
               value: {{ .Values.gitRepoConfig.exec | quote }}
+            {{- if .Values.gitRepoConfig.opiMain }}
+            - name: OPIMAIN
+              value: {{ .Values.gitRepoConfig.opiMain | quote }}
+            {{- end }}
             {{- if .Values.gitRepoConfig.ansiblePlaybook }}
             - name: ANSIBLE_PLAYBOOK
               value: {{ .Values.gitRepoConfig.ansiblePlaybook | quote }}
