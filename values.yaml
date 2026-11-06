@@ -5,6 +5,10 @@ image:
   imagePullPolicy: Always
 
 
+# Mount the beamline nfsMounts as Kubernetes NFS volumes. A console pod has no
+# CAP_SYS_ADMIN, so its Ansible role cannot mount them itself.
+mountNfs: false
+
 replicaCount: 1
 route:
   enabled: true ## enable the route (for openshift)

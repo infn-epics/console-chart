@@ -194,6 +194,12 @@ spec:
               mountPath: /phoebus/phoebus_settings.ini
               subPath: phoebus_settings.ini
             {{- end }}
+            {{- if .Values.mountNfs }}
+            {{- range .Values.nfsMounts }}
+            - name: {{ .name }}-nfs
+              mountPath: {{ .mountPath }}
+            {{- end }}
+            {{- end }}
       volumes:
         - name: phoebus-volume
           emptyDir: {}
@@ -211,6 +217,14 @@ spec:
             items:
             - key: phoebus_settings.ini
               path: phoebus_settings.ini
+        {{- end }}
+        {{- if .Values.mountNfs }}
+        {{- range .Values.nfsMounts }}
+        - name: {{ .name }}-nfs
+          nfs:
+            server: {{ .server }}
+            path: {{ .path }}
+        {{- end }}
         {{- end }}
   volumeClaimTemplates:
     
